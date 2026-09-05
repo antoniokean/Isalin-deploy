@@ -5,7 +5,7 @@ const TYPE_TAG = {
   syllable: "",
 };
 
-export default function BreakdownView({ breakdown }) {
+export default function BreakDownView({ breakdown }) {
   if (!breakdown || breakdown.length === 0) return null;
 
   return (
