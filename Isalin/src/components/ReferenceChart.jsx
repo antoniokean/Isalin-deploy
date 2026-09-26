@@ -1,9 +1,3 @@
-const STANDALONE_VOWELS = [
-  { label: "a", glyph: "\u1700" },
-  { label: "e / i", glyph: "\u1701" },
-  { label: "o / u", glyph: "\u1702" },
-];
-
 const CONSONANTS = [
   { letter: "b", glyph: "\u170A" },
   { letter: "k", glyph: "\u1703" },
@@ -26,6 +20,14 @@ const KUDLIT_I = "\u1712";
 const KUDLIT_U = "\u1713";
 const VIRAMA = "\u1714";
 
+// Standalone vowel glyphs — these don't follow the consonant+kudlit
+// pattern, so they're keyed by row label instead of a suffix.
+const STANDALONE_VOWEL_BY_ROW = {
+  a: "\u1700",
+  "e / i": "\u1701",
+  "o / u": "\u1702",
+};
+
 const ROWS = [
   { label: "a", suffix: "", note: "base glyph, no mark" },
   { label: "e / i", suffix: KUDLIT_I, note: "kudlit above" },
@@ -39,28 +41,15 @@ export default function ReferenceChart() {
       <p className="sidebar-note" style={{ marginBottom: 10 }}>
         Every consonant glyph carries an inherent "a" sound. A kudlit mark
         changes it to e/i or o/u; a virama strikes the vowel out entirely.
-      </p>
-
-      <p className="breakdown-title" style={{ marginBottom: 8 }}>
-        Standalone vowels
-      </p>
-      <div className="chip-row" style={{ marginBottom: 18 }}>
-        {STANDALONE_VOWELS.map((v) => (
-          <span className="chip" key={v.label}>
-            <span className="glyph">{v.glyph}</span>
-            {v.label}
-          </span>
-        ))}
-      </div>
-
-      <p className="breakdown-title" style={{ marginBottom: 8 }}>
-        Consonants
+        The "vowel" column shows the standalone glyph used when a syllable
+        has no consonant at all.
       </p>
       <div className="reference-table-wrap">
         <table className="reference-table">
           <thead>
             <tr>
               <th></th>
+              <th>vowel</th>
               {CONSONANTS.map((c) => (
                 <th key={c.letter}>{c.letter}</th>
               ))}
@@ -72,6 +61,9 @@ export default function ReferenceChart() {
                 <th className="row-label" title={row.note}>
                   {row.label}
                 </th>
+                <td className="reference-glyph">
+                  {STANDALONE_VOWEL_BY_ROW[row.label] || "—"}
+                </td>
                 {CONSONANTS.map((c) => (
                   <td key={c.letter} className="reference-glyph">
                     {c.glyph + row.suffix}
