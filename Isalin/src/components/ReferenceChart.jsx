@@ -1,3 +1,9 @@
+const STANDALONE_VOWELS = [
+  { label: "a", glyph: "\u1700" },
+  { label: "e / i", glyph: "\u1701" },
+  { label: "o / u", glyph: "\u1702" },
+];
+
 const CONSONANTS = [
   { letter: "b", glyph: "\u170A" },
   { letter: "k", glyph: "\u1703" },
@@ -33,6 +39,22 @@ export default function ReferenceChart() {
       <p className="sidebar-note" style={{ marginBottom: 10 }}>
         Every consonant glyph carries an inherent "a" sound. A kudlit mark
         changes it to e/i or o/u; a virama strikes the vowel out entirely.
+      </p>
+
+      <p className="breakdown-title" style={{ marginBottom: 8 }}>
+        Standalone vowels
+      </p>
+      <div className="chip-row" style={{ marginBottom: 18 }}>
+        {STANDALONE_VOWELS.map((v) => (
+          <span className="chip" key={v.label}>
+            <span className="glyph">{v.glyph}</span>
+            {v.label}
+          </span>
+        ))}
+      </div>
+
+      <p className="breakdown-title" style={{ marginBottom: 8 }}>
+        Consonants
       </p>
       <div className="reference-table-wrap">
         <table className="reference-table">
