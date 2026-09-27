@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "isalin_app_password";
 
+const BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : "/api";
+
 export function getStoredPassword() {
   return sessionStorage.getItem(STORAGE_KEY) || "";
 }
@@ -21,7 +25,7 @@ export default function PasswordGate({ children }) {
   async function verify(pw, showError = true) {
     setChecking(true);
     try {
-      const res = await fetch("/api/health", {
+      const res = await fetch(`${BASE}/health`, {
         headers: { "x-app-password": pw },
       });
       if (res.ok) {
