@@ -297,6 +297,26 @@ console.log("Allowed CORS origins:", allowedOrigins);
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
+// Simple shared-password gate: every /api request must include the
+// correct password in a header, or it's rejected. This covers every
+// route uniformly, including DELETE /api/history. Set APP_PASSWORD
+// as an environment variable to turn this on.
+const APP_PASSWORD = process.env.APP_PASSWORD;
+
+function requirePassword(req, res, next) {
+  if (!APP_PASSWORD) {
+    console.warn("APP_PASSWORD not set — API is running WITHOUT a password gate.");
+    return next();
+  }
+  const provided = req.header("x-app-password");
+  if (provided !== APP_PASSWORD) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  next();
+}
+
+app.use("/api", requirePassword);
+
 app.post("/api/convert", async (req, res) => {
   const { text, direction, save } = req.body || {};
 
