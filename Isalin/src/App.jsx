@@ -3,6 +3,7 @@ import { convert, fetchHistory, clearHistory } from "./api";
 import BreakdownView from "./components/BreakdownView";
 import HistoryList from "./components/HistoryList";
 import ReferenceChart from "./components/ReferenceChart";
+import PasswordGate from "./components/PasswordGate";
 
 const PLACEHOLDER = {
   "latin-to-baybayin": "Type Filipino text, e.g. bahay, bangka, pilipinas...",
@@ -50,12 +51,10 @@ export default function App() {
     const value = e.target.value;
     setInput(value);
     clearTimeout(debounceRef.current);
-    // live preview only — don't save every keystroke to history
     debounceRef.current = setTimeout(() => runConversion(value, direction, false), 350);
   }
 
   function handleInputBlur() {
-    // user is done typing (clicked away) — save this as one history entry
     clearTimeout(debounceRef.current);
     if (input.trim()) runConversion(input, direction, true);
   }
@@ -97,95 +96,97 @@ export default function App() {
   const isLatinFirst = direction === "latin-to-baybayin";
 
   return (
-    <div className="app-shell">
-      <header className="app-header">
-        <div>
-          <h1 className="app-title">
-            Isalin <span className="glyphs">ᜁᜐᜎᜒᜈ᜔</span>
-          </h1>
-          <p className="app-subtitle">
-            A transliterator system that reads syllables between the Latin
-            alphabet and Baybayin writing system.
-          </p>
-        </div>
-      </header>
-
-      <div className="main-grid">
-        <section className="converter">
-          <div className="direction-row">
-            <span className={`direction-label ${isLatinFirst ? "active" : ""}`}>
-              A B C
-            </span>
-            <button
-              className={`swap-button ${isLatinFirst ? "" : "flipped"}`}
-              onClick={handleSwap}
-              aria-label="Swap conversion direction"
-              title="Swap direction"
-            >
-              ⇄
-            </button>
-            <span className={`direction-label ${!isLatinFirst ? "active" : ""}`}>
-              ᜃ ᜄ ᜅ
-            </span>
+    <PasswordGate>
+      <div className="app-shell">
+        <header className="app-header">
+          <div>
+            <h1 className="app-title">
+              Isalin <span className="glyphs">ᜁᜐᜎᜒᜈ᜔</span>
+            </h1>
+            <p className="app-subtitle">
+              A transliterator system that reads syllables between the Latin
+              alphabet and Baybayin writing system.
+            </p>
           </div>
+        </header>
 
-          <label className="field-label" htmlFor="input-field">
-            {isLatinFirst ? "Latin text" : "Baybayin text"}
-          </label>
-          <textarea
-            id="input-field"
-            className="text-area input"
-            value={input}
-            onChange={handleInputChange}
-            onBlur={handleInputBlur}
-            placeholder={PLACEHOLDER[direction]}
-            style={isLatinFirst ? {} : { fontFamily: "var(--font-baybayin)", fontSize: "1.3rem" }}
-          />
+        <div className="main-grid">
+          <section className="converter">
+            <div className="direction-row">
+              <span className={`direction-label ${isLatinFirst ? "active" : ""}`}>
+                A B C
+              </span>
+              <button
+                className={`swap-button ${isLatinFirst ? "" : "flipped"}`}
+                onClick={handleSwap}
+                aria-label="Swap conversion direction"
+                title="Swap direction"
+              >
+                ⇄
+              </button>
+              <span className={`direction-label ${!isLatinFirst ? "active" : ""}`}>
+                ᜃ ᜄ ᜅ
+              </span>
+            </div>
 
-          <div className="converter-meta">
-            <span className={`status-text ${status.error ? "error" : ""}`}>
-              {status.text}
-            </span>
-          </div>
-
-          <div className="output-block">
-            <label className="field-label">
-              {isLatinFirst ? "Baybayin output" : "Latin output"}
+            <label className="field-label" htmlFor="input-field">
+              {isLatinFirst ? "Latin text" : "Baybayin text"}
             </label>
             <textarea
-              className="text-area output"
-              value={output}
-              readOnly
-              placeholder="Output appears here"
-              style={isLatinFirst ? {} : { fontFamily: "var(--font-body)", fontSize: "1.05rem" }}
+              id="input-field"
+              className="text-area input"
+              value={input}
+              onChange={handleInputChange}
+              onBlur={handleInputBlur}
+              placeholder={PLACEHOLDER[direction]}
+              style={isLatinFirst ? {} : { fontFamily: "var(--font-baybayin)", fontSize: "1.3rem" }}
             />
+
             <div className="converter-meta">
-              <span></span>
-              <button className="copy-button" onClick={handleCopy}>
-                Copy output
-              </button>
+              <span className={`status-text ${status.error ? "error" : ""}`}>
+                {status.text}
+              </span>
             </div>
-          </div>
 
-          <BreakdownView breakdown={breakdown} />
+            <div className="output-block">
+              <label className="field-label">
+                {isLatinFirst ? "Baybayin output" : "Latin output"}
+              </label>
+              <textarea
+                className="text-area output"
+                value={output}
+                readOnly
+                placeholder="Output appears here"
+                style={isLatinFirst ? {} : { fontFamily: "var(--font-body)", fontSize: "1.05rem" }}
+              />
+              <div className="converter-meta">
+                <span></span>
+                <button className="copy-button" onClick={handleCopy}>
+                  Copy output
+                </button>
+              </div>
+            </div>
 
-          <p className="footnote">
-            Quick glossary: <strong>vowel</strong> = the core sound of a
-            syllable. <strong>Coda</strong> = a trailing consonant with no
-            vowel after it. <strong>Virama</strong> = the mark that strikes
-            out a glyph's vowel to write a coda. Baybayin also merges i/e
-            and o/u into one vowel mark each.
-          </p>
-        </section>
+            <BreakdownView breakdown={breakdown} />
 
-        <div>
-          <HistoryList history={history} onSelect={handleHistorySelect} onClear={handleClearHistory} />
-          <div className="sidebar" style={{ marginTop: 20 }}>
-            <h2 className="sidebar-title">Alphabet reference</h2>
-            <ReferenceChart />
+            <p className="footnote">
+              Quick glossary: <strong>vowel</strong> = the core sound of a
+              syllable. <strong>Coda</strong> = a trailing consonant with no
+              vowel after it. <strong>Virama</strong> = the mark that strikes
+              out a glyph's vowel to write a coda. Baybayin also merges i/e
+              and o/u into one vowel mark each.
+            </p>
+          </section>
+
+          <div>
+            <HistoryList history={history} onSelect={handleHistorySelect} onClear={handleClearHistory} />
+            <div className="sidebar" style={{ marginTop: 20 }}>
+              <h2 className="sidebar-title">Alphabet reference</h2>
+              <ReferenceChart />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </PasswordGate>
   );
 }
